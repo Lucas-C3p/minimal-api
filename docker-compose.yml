@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  minimal-api:
+    build: .
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/minimal_api.db
+      - Jwt__Key=minimal-api-production-key-32-chars-minimum-security
+      - Jwt__Issuer=MinimalApi
+      - Jwt__Audience=MinimalApi
+      - Jwt__ExpiresInMinutes=60
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Opcional: Adicionar um banco PostgreSQL para produção
+  # postgres:
+  #   image: postgres:15
+  #   environment:
+  #     POSTGRES_DB: minimal_api
+  #     POSTGRES_USER: minimal_api_user
+  #     POSTGRES_PASSWORD: your_secure_password
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   ports:
+  #     - "5432:5432"
+  #   restart: unless-stopped
+
+# volumes:
+#   postgres_data:
+
